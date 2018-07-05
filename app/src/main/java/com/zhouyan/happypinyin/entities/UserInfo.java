@@ -38,6 +38,16 @@ public class UserInfo implements Serializable{
     private Long updateTime;
     private String birthdayStr;
     private String createTimeStr;
+    private int age;
+
+
+    public int getAge() {
+        return age;
+    }
+
+    public void setAge(int age) {
+        this.age = age;
+    }
 
     public String getUserId() {
         return userId;

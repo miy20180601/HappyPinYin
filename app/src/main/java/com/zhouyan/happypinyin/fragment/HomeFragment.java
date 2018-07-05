@@ -19,10 +19,12 @@ import com.example.zhouwei.library.CustomPopWindow;
 import com.tencent.mm.opensdk.modelpay.PayReq;
 import com.tencent.mm.opensdk.openapi.IWXAPI;
 import com.tencent.mm.opensdk.openapi.WXAPIFactory;
+import com.zhouyan.happypinyin.BuildConfig;
 import com.zhouyan.happypinyin.R;
 import com.zhouyan.happypinyin.activity.MainActivity1;
 import com.zhouyan.happypinyin.adapter.VideoQuickAdaper;
 import com.zhouyan.happypinyin.base.BaseFragment;
+import com.zhouyan.happypinyin.busmsg.PayMessage;
 import com.zhouyan.happypinyin.entities.BaseEntity;
 import com.zhouyan.happypinyin.entities.PrePayModel;
 import com.zhouyan.happypinyin.entities.UserInfo;
@@ -31,6 +33,10 @@ import com.zhouyan.happypinyin.network.BaseObserver;
 import com.zhouyan.happypinyin.network.RetrofitFactory;
 import com.zhouyan.happypinyin.network.RxSchedulers;
 import com.zhouyan.happypinyin.utils.Constant;
+
+import org.greenrobot.eventbus.EventBus;
+import org.greenrobot.eventbus.Subscribe;
+import org.greenrobot.eventbus.ThreadMode;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -69,9 +75,10 @@ public class HomeFragment extends BaseFragment {
     @Override
     public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
+        mUserInfo = (UserInfo) mACache.getAsObject(Constant.USERINFO);
+        EventBus.getDefault().register(this);
         initView();
         loadData();
-
     }
 
     private void initView() {
@@ -160,6 +167,20 @@ public class HomeFragment extends BaseFragment {
         TextView tvPrice = contentView.findViewById(R.id.tv_price);
         tvPrice.setText(videoModel.getMuch() + "元");
     }
+    @Subscribe(threadMode = ThreadMode.MAIN)
+    public void Event(PayMessage messageEvent) {
+        loadData();
+    }
+
+
+    @Override
+    public void onDestroy() {
+        super.onDestroy();
+        if(EventBus.getDefault().isRegistered(this)) {
+            EventBus.getDefault().unregister(this);
+        }
+    }
+
 
     private void prePay(VideoModel videoModel) {
         String videoId = null;
@@ -168,7 +189,12 @@ public class HomeFragment extends BaseFragment {
             videoId = videoModel.getVideoId();
             amount = videoModel.getMuch();
         }else {
-            amount = 200;
+            if (BuildConfig.DEBUG){
+                amount = 0.1;
+            }else {
+                amount = 200;
+            }
+
         }
         Observable<BaseEntity<PrePayModel>> observable = RetrofitFactory
                 .getInstance().prepay(amount, videoId, isTotalPay,mUserInfo.getUserId());

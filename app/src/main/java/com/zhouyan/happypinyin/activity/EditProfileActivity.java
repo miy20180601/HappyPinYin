@@ -15,6 +15,7 @@ import android.widget.EditText;
 import android.widget.TextView;
 
 import com.bumptech.glide.Glide;
+import com.bumptech.glide.request.RequestOptions;
 import com.tbruyelle.rxpermissions2.RxPermissions;
 import com.zhouyan.happypinyin.R;
 import com.zhouyan.happypinyin.base.BaseActivity;
@@ -62,6 +63,7 @@ public class EditProfileActivity extends BaseActivity {
     private PhotoUtils photoUtils;
     private String mAge;
     private File mAvatarFile;
+    private UserInfo mUserInfo;
 
     @Override
     public int getLayoutId() {
@@ -71,10 +73,21 @@ public class EditProfileActivity extends BaseActivity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        mUserInfo = (UserInfo) mACache.getAsObject(Constant.USERINFO);
         barTitle.setText("编辑个人资料");
         barTvRight.setText("修改");
         barTvRight.setVisibility(View.VISIBLE);
         setPortraitChangeListener();
+        initviews();
+    }
+
+    private void initviews() {
+        if (mUserInfo!=null){
+            RequestOptions options = new RequestOptions();
+            options.error(R.mipmap.data_button_avatar_n);
+            Glide.with(mContext).load(mUserInfo.getPhoto()).apply(options).into(ivAvatar);
+            tvAge.setText(mUserInfo.getAge()+"岁");
+        }
     }
 
     /**
@@ -153,20 +166,24 @@ public class EditProfileActivity extends BaseActivity {
                 alertDialog();
                 break;
             case R.id.bar_tv_right:
-                updateInfo(mAvatarFile);
+                if (mAvatarFile!=null||mAge!=null){
+                    updateInfo();
+                }
+
                 break;
         }
     }
 
-    private void updateInfo(File file) {
+    private void updateInfo() {
         MultipartBody.Builder builder = new MultipartBody.Builder()
                 .setType(MultipartBody.FORM);
         if (!TextUtils.isEmpty(mAge)){
             builder.addFormDataPart("age",mAge);
         }
-
-        RequestBody imageBody = RequestBody.create(MediaType.parse("multipart/form-data"), file);
-        builder.addFormDataPart("type", file.getName(), imageBody);//"files" 后台接收图片流的参数名
+        if (mAvatarFile!=null){
+            RequestBody imageBody = RequestBody.create(MediaType.parse("multipart/form-data"), mAvatarFile);
+            builder.addFormDataPart("type", mAvatarFile.getName(), imageBody);//"files" 后台接收图片流的参数名
+        }
         List<MultipartBody.Part> parts = builder.build().parts();
         Observable<BaseEntity<UserInfo>> observable = RetrofitFactory.getInstance()
                 .appUpdateInfo(parts);

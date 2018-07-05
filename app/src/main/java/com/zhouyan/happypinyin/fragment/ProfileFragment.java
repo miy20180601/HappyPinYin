@@ -57,12 +57,20 @@ public class ProfileFragment extends BaseFragment {
     @Override
     public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
+
+
+    }
+
+    @Override
+    public void onResume() {
+        super.onResume();
         mUserInfo = (UserInfo) mACache.getAsObject(Constant.USERINFO);
         RequestOptions options = new RequestOptions();
         options.error(R.mipmap.data_button_avatar_n);
         Glide.with(mContext).load(mUserInfo.getPhoto()).apply(options).into(profileAvatar);
         profileName.setText(mUserInfo.getNickName());
-        profileId.setText(mUserInfo.getBirthdayStr());
+        profileId.setText(mUserInfo.getAge()+"岁");
+
     }
 
     @OnClick({R.id.edit_profile, R.id.tv_logout})
