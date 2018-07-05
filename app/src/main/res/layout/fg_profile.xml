@@ -99,6 +99,14 @@
             android:drawableTop="@mipmap/wx_erwei"
             android:text="扫描添加微信"/>
     </LinearLayout>
+    <TextView
+        android:id="@+id/tv_share"
+        android:layout_width="match_parent"
+        android:layout_height="@dimen/dp_40"
+        android:layout_marginTop="@dimen/dp_10"
+        android:gravity="center"
+        android:background="@color/white"
+        android:text="分享给朋友"/>
 
     <View
         android:layout_width="match_parent"
@@ -111,7 +119,7 @@
         android:layout_height="40dp"
         android:layout_marginLeft="10dp"
         android:layout_marginRight="10dp"
-        android:layout_marginBottom="100dp"
+        android:layout_marginBottom="50dp"
         android:background="@drawable/shape_btn_bg"
         android:gravity="center"
         android:text="退出登录"

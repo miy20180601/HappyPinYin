@@ -2,6 +2,8 @@ package com.zhouyan.happypinyin.fragment;
 
 import android.content.DialogInterface;
 import android.content.Intent;
+import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
@@ -13,6 +15,11 @@ import android.widget.TextView;
 
 import com.bumptech.glide.Glide;
 import com.bumptech.glide.request.RequestOptions;
+import com.tencent.mm.opensdk.modelmsg.SendMessageToWX;
+import com.tencent.mm.opensdk.modelmsg.WXMediaMessage;
+import com.tencent.mm.opensdk.modelmsg.WXWebpageObject;
+import com.tencent.mm.opensdk.openapi.IWXAPI;
+import com.tencent.mm.opensdk.openapi.WXAPIFactory;
 import com.zhouyan.happypinyin.R;
 import com.zhouyan.happypinyin.activity.EditProfileActivity;
 import com.zhouyan.happypinyin.activity.LoginActivity;
@@ -27,6 +34,7 @@ import com.zhouyan.happypinyin.utils.Constant;
 import com.zhouyan.happypinyin.utils.DeviceUuidFactory;
 import com.zhouyan.happypinyin.utils.NToast;
 import com.zhouyan.happypinyin.utils.SPUtil;
+import com.zhouyan.happypinyin.utils.Util;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
@@ -73,7 +81,7 @@ public class ProfileFragment extends BaseFragment {
 
     }
 
-    @OnClick({R.id.edit_profile, R.id.tv_logout})
+    @OnClick({R.id.edit_profile, R.id.tv_logout,R.id.tv_share})
     public void onViewClicked(View view) {
         switch (view.getId()) {
             case R.id.edit_profile:
@@ -90,7 +98,33 @@ public class ProfileFragment extends BaseFragment {
                         }).setPositiveButton("取消",null).show();
 
                 break;
+            case R.id.tv_share:
+                shareToWx();
+                break;
         }
+    }
+
+    private void shareToWx() {
+        IWXAPI wxApi = WXAPIFactory.createWXAPI(mContext, null);
+        wxApi.registerApp(Constant.WX_APP_ID);
+        WXWebpageObject webpage = new WXWebpageObject();
+        webpage.webpageUrl = "http://www.baidu.com";
+        WXMediaMessage msg = new WXMediaMessage(webpage);
+        msg.title = "标题";
+        msg.description = "描述信息";
+        Bitmap thumb = BitmapFactory.decodeResource(getResources(), R.mipmap.ic_launcher);
+        msg.thumbData = Util.bmpToByteArray(thumb, true);
+
+        SendMessageToWX.Req req = new SendMessageToWX.Req();
+        req.transaction = buildTransaction("webpage");
+        req.message = msg;
+//        req.scene = isTimelineCb.isChecked() ? SendMessageToWX.Req.WXSceneTimeline : SendMessageToWX.Req.WXSceneSession;
+        req.scene =  SendMessageToWX.Req.WXSceneSession;
+        wxApi.sendReq(req);
+    }
+
+    private String buildTransaction(final String type) {
+        return (type == null) ? String.valueOf(System.currentTimeMillis()) : type + System.currentTimeMillis();
     }
 
     private void applogout() {

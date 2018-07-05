@@ -41,6 +41,7 @@
             android:id="@+id/rb_single"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
+            android:checked="true"
             android:text="单个视频"/>
         <RadioButton
             android:id="@+id/rb_all"
