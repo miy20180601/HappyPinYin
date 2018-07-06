@@ -110,8 +110,8 @@ public class ProfileFragment extends BaseFragment {
         WXWebpageObject webpage = new WXWebpageObject();
         webpage.webpageUrl = "http://www.baidu.com";
         WXMediaMessage msg = new WXMediaMessage(webpage);
-        msg.title = "标题";
-        msg.description = "描述信息";
+        msg.title = "快乐拼音";
+        msg.description = "孩子学习的好帮手";
         Bitmap thumb = BitmapFactory.decodeResource(getResources(), R.mipmap.ic_launcher);
         msg.thumbData = Util.bmpToByteArray(thumb, true);
 
