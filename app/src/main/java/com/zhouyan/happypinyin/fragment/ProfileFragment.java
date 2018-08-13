@@ -23,7 +23,6 @@ import com.tencent.mm.opensdk.openapi.WXAPIFactory;
 import com.zhouyan.happypinyin.R;
 import com.zhouyan.happypinyin.activity.EditProfileActivity;
 import com.zhouyan.happypinyin.activity.LoginActivity;
-import com.zhouyan.happypinyin.activity.MainActivity1;
 import com.zhouyan.happypinyin.base.BaseFragment;
 import com.zhouyan.happypinyin.entities.BaseEntity;
 import com.zhouyan.happypinyin.entities.UserInfo;
@@ -108,10 +107,10 @@ public class ProfileFragment extends BaseFragment {
         IWXAPI wxApi = WXAPIFactory.createWXAPI(mContext, null);
         wxApi.registerApp(Constant.WX_APP_ID);
         WXWebpageObject webpage = new WXWebpageObject();
-        webpage.webpageUrl = "http://www.baidu.com";
+        webpage.webpageUrl = "https://apk-1256005692.cos.ap-guangzhou.myqcloud.com/happypinyin1.1.1.apk";
         WXMediaMessage msg = new WXMediaMessage(webpage);
         msg.title = "快乐拼音";
-        msg.description = "孩子学习的好帮手";
+        msg.description = "孩子学习的好帮手，点击打开->点击右上角->-在浏览器中打开-即可下载";
         Bitmap thumb = BitmapFactory.decodeResource(getResources(), R.mipmap.ic_launcher);
         msg.thumbData = Util.bmpToByteArray(thumb, true);
 

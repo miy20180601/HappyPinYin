@@ -76,17 +76,17 @@ public class EditProfileActivity extends BaseActivity {
         mUserInfo = (UserInfo) mACache.getAsObject(Constant.USERINFO);
         barTitle.setText("编辑个人资料");
         barTvRight.setText("修改");
-        barTvRight.setVisibility(View.VISIBLE);
+//        barTvRight.setVisibility(View.VISIBLE);
         setPortraitChangeListener();
         initviews();
     }
 
     private void initviews() {
-        if (mUserInfo!=null){
+        if (mUserInfo != null) {
             RequestOptions options = new RequestOptions();
             options.error(R.mipmap.data_button_avatar_n);
             Glide.with(mContext).load(mUserInfo.getPhoto()).apply(options).into(ivAvatar);
-            tvAge.setText(mUserInfo.getAge()+"岁");
+            tvAge.setText(mUserInfo.getAge() + "岁");
         }
     }
 
@@ -140,7 +140,7 @@ public class EditProfileActivity extends BaseActivity {
                     @Override
                     public void accept(@NonNull File file) throws Exception {
                         mAvatarFile = file;
-                        Glide.with(mContext).load(file).into(ivAvatar);
+                        updateImage(file);
                     }
                 });
     }
@@ -150,10 +150,27 @@ public class EditProfileActivity extends BaseActivity {
      */
     private void updateImage(final File file) {
 
+        MultipartBody.Builder builder = new MultipartBody.Builder()
+                .setType(MultipartBody.FORM);
 
+        RequestBody imageBody = RequestBody.create(MediaType.parse("multipart/form-data"), mAvatarFile);
+        builder.addFormDataPart("type", mAvatarFile.getName(), imageBody);//"files" 后台接收图片流的参数名
+
+        List<MultipartBody.Part> parts = builder.build().parts();
+        Observable<BaseEntity<UserInfo>> observable = RetrofitFactory.getInstance()
+                .appUpdatePhotoInfo(parts);
+        observable.compose(RxSchedulers.<BaseEntity<UserInfo>>compose(mContext)).subscribe(new BaseObserver<UserInfo>() {
+
+            @Override
+            protected void onHandleSuccess(UserInfo userInfo, String msg) {
+                mACache.put(Constant.USERINFO, userInfo);
+                Glide.with(mContext).load(file).into(ivAvatar);
+                finish();
+            }
+        });
     }
 
-    @OnClick({R.id.bar_iv_back, R.id.rl_avatar, R.id.rl_age,R.id.bar_tv_right})
+    @OnClick({R.id.bar_iv_back, R.id.rl_avatar, R.id.rl_age, R.id.bar_tv_right})
     public void onViewClicked(View view) {
         switch (view.getId()) {
             case R.id.bar_iv_back:
@@ -166,7 +183,7 @@ public class EditProfileActivity extends BaseActivity {
                 alertDialog();
                 break;
             case R.id.bar_tv_right:
-                if (mAvatarFile!=null||mAge!=null){
+                if (mAvatarFile != null || mAge != null) {
                     updateInfo();
                 }
 
@@ -175,23 +192,14 @@ public class EditProfileActivity extends BaseActivity {
     }
 
     private void updateInfo() {
-        MultipartBody.Builder builder = new MultipartBody.Builder()
-                .setType(MultipartBody.FORM);
-        if (!TextUtils.isEmpty(mAge)){
-            builder.addFormDataPart("age",mAge);
-        }
-        if (mAvatarFile!=null){
-            RequestBody imageBody = RequestBody.create(MediaType.parse("multipart/form-data"), mAvatarFile);
-            builder.addFormDataPart("type", mAvatarFile.getName(), imageBody);//"files" 后台接收图片流的参数名
-        }
-        List<MultipartBody.Part> parts = builder.build().parts();
         Observable<BaseEntity<UserInfo>> observable = RetrofitFactory.getInstance()
-                .appUpdateInfo(parts);
+                .appUpdateAgeInfo(mAge);
         observable.compose(RxSchedulers.<BaseEntity<UserInfo>>compose(mContext)).subscribe(new BaseObserver<UserInfo>() {
 
             @Override
             protected void onHandleSuccess(UserInfo userInfo, String msg) {
-                mACache.put(Constant.USERINFO,userInfo);
+                mACache.put(Constant.USERINFO, userInfo);
+                tvAge.setText(mAge + "岁");
                 finish();
             }
         });
@@ -216,14 +224,17 @@ public class EditProfileActivity extends BaseActivity {
             @Override
             public void onClick(View v) {
                 mAge = editAge.getText().toString().trim();
-                if (!TextUtils.isEmpty(mAge)){
-                    tvAge.setText(mAge+"岁");
+                if (!TextUtils.isEmpty(mAge)) {
+                    updateInfo();
+
                 }
+
                 dialog.dismiss();
             }
         });
 
     }
+
     /**
      * 弹出图片选择框
      */
@@ -244,7 +255,7 @@ public class EditProfileActivity extends BaseActivity {
 
                 })
                 .addSheetItem("相册", ActionSheetDialog.SheetItemColor.Blue, new ActionSheetDialog
-                        .OnSheetItemClickListener() {
+                                .OnSheetItemClickListener() {
 
                             @Override
                             public void onClick(int which) {

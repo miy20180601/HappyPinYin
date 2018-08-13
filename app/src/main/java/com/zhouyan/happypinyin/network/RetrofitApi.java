@@ -90,13 +90,28 @@ public interface RetrofitApi {
             @Field("userId") String userId
     );
 
+
     /**
-     * 修改个人信息
+     * 修改头像
      */
     @Multipart
-    @POST("qzVideo/appUpdateInfo.do")
-    Observable<BaseEntity<UserInfo>> appUpdateInfo(@Part List<MultipartBody.Part> files);
+    @POST("qzVideo/appUpdatePhotoInfo.do")
+    Observable<BaseEntity<UserInfo>> appUpdatePhotoInfo(@Part List<MultipartBody.Part> files);
 
 
+    /**
+     * 修改年龄
+     */
+    @FormUrlEncoded
+    @POST("qzVideo/appUpdateAgeInfo.do")
+    Observable<BaseEntity<UserInfo>> appUpdateAgeInfo(@Field("age") String age);
+
+    /**
+     *  全部购买价格
+     *
+     */
+    @FormUrlEncoded
+    @POST("qzVideo/appVideoTotalPrice.do")
+    Observable<BaseEntity<Double>> appVideoTotalPrice(@Field("i") String i );
 }
 

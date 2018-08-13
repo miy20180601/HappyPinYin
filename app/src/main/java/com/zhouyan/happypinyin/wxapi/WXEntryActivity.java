@@ -63,23 +63,23 @@ public class WXEntryActivity extends Activity implements IWXAPIEventHandler {
 	// 第三方应用发送到微信的请求处理后的响应结果，会回调到该方法
 	@Override
 	public void onResp(BaseResp resp) {
-		int result = 0;
-		
+    	String result = resp.errStr;
 		switch (resp.errCode) {
 		case BaseResp.ErrCode.ERR_OK:
-
+			result="分享成功";
 			break;
 		case BaseResp.ErrCode.ERR_USER_CANCEL:
-
+			result="取消分享";
 			break;
 		case BaseResp.ErrCode.ERR_AUTH_DENIED:
-
+			result="分享失败";
 			break;
 		default:
 			break;
 		}
-		
+
 		Toast.makeText(this, result, Toast.LENGTH_LONG).show();
+		finish();
 	}
 
 }

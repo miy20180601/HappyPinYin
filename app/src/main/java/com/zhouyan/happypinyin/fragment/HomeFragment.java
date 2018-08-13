@@ -21,7 +21,6 @@ import com.tencent.mm.opensdk.openapi.IWXAPI;
 import com.tencent.mm.opensdk.openapi.WXAPIFactory;
 import com.zhouyan.happypinyin.BuildConfig;
 import com.zhouyan.happypinyin.R;
-import com.zhouyan.happypinyin.activity.MainActivity1;
 import com.zhouyan.happypinyin.adapter.VideoQuickAdaper;
 import com.zhouyan.happypinyin.base.BaseFragment;
 import com.zhouyan.happypinyin.busmsg.PayMessage;
@@ -66,6 +65,7 @@ public class HomeFragment extends BaseFragment {
     private IWXAPI mWxApi;
 
     private String isTotalPay;
+    private double totalPrice;
 
     @Override
     public int getLayoutId() {
@@ -121,6 +121,14 @@ public class HomeFragment extends BaseFragment {
                         mVideoAdapter.setNewData(mDataList);
                     }
                 });
+
+        Observable<BaseEntity<Double>> totalPriceObservable = RetrofitFactory.getInstance().appVideoTotalPrice(null);
+        totalPriceObservable.compose(RxSchedulers.<BaseEntity<Double>>compose(mContext)).subscribe(new BaseObserver<Double>() {
+            @Override
+            protected void onHandleSuccess(Double price, String msg) {
+                totalPrice = price;
+            }
+        });
     }
 
     /**
@@ -131,15 +139,19 @@ public class HomeFragment extends BaseFragment {
      */
     private void handleLogic(View contentView, final VideoModel videoModel) {
         RadioGroup radioGroup = contentView.findViewById(R.id.radio_group);
+        final TextView tvPrice = contentView.findViewById(R.id.tv_price);
+        tvPrice.setText(videoModel.getMuch() + "元");
         radioGroup.setOnCheckedChangeListener(new RadioGroup.OnCheckedChangeListener() {
             @Override
             public void onCheckedChanged(RadioGroup group, int checkedId) {
                 switch (checkedId){
                     case R.id.rb_single:
                         isTotalPay = null;
+                        tvPrice.setText(videoModel.getMuch() + "元");
                         break;
                     case R.id.rb_all:
                         isTotalPay = "yes";
+                        tvPrice.setText(totalPrice+"元");
                         break;
                 }
             }
@@ -164,8 +176,6 @@ public class HomeFragment extends BaseFragment {
         contentView.findViewById(R.id.ll_alipay).setOnClickListener(listener);
         contentView.findViewById(R.id.tv_cancel).setOnClickListener(listener);
 
-        TextView tvPrice = contentView.findViewById(R.id.tv_price);
-        tvPrice.setText(videoModel.getMuch() + "元");
     }
     @Subscribe(threadMode = ThreadMode.MAIN)
     public void Event(PayMessage messageEvent) {
@@ -192,7 +202,7 @@ public class HomeFragment extends BaseFragment {
             if (BuildConfig.DEBUG){
                 amount = 0.1;
             }else {
-                amount = 200;
+                amount = totalPrice;;
             }
 
         }
