@@ -54,6 +54,10 @@ public class ForgetPasswordActivity extends BaseActivity {
     //正在获取请求码
     boolean isBright = true;
 
+    private String  mPhone, mCode, mPassword,mConfirmPwd;
+    //信息是否填写
+    private boolean isPwdFill, isCodeFill, isPhoneFill,isConfirmPwdFill;
+
     /**
      * 倒计时60秒，一次1秒
      */
@@ -76,9 +80,6 @@ public class ForgetPasswordActivity extends BaseActivity {
     @BindView(R.id.main)
     LinearLayout mMain;
 
-    private String mNickName, mPhone, mCode, mPassword,mConfirmPwd;
-    //信息是否填写
-    private boolean isNickNameFill, isPwdFill, isCodeFill, isPhoneFill,isConfirmPwdFill;
 
 
     @Override
@@ -211,7 +212,7 @@ public class ForgetPasswordActivity extends BaseActivity {
     }
 
     private void checkConfirmEnable() {
-        if (isNickNameFill && isPhoneFill && isCodeFill && isPwdFill && isConfirmPwdFill)
+        if (isPhoneFill && isCodeFill && isPwdFill && isConfirmPwdFill)
             mBtnConfirm.setEnabled(true);
         else mBtnConfirm.setEnabled(false);
     }
