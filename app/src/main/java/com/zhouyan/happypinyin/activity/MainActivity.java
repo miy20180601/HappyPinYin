@@ -3,12 +3,18 @@ package com.zhouyan.happypinyin.activity;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentPagerAdapter;
+import android.widget.RadioButton;
 import android.widget.RadioGroup;
 import com.zhouyan.happypinyin.R;
 import com.zhouyan.happypinyin.base.BaseActivity;
+import com.zhouyan.happypinyin.busmsg.LoginMessage;
 import com.zhouyan.happypinyin.fragment.HomeFragment;
 import com.zhouyan.happypinyin.fragment.ProfileFragment;
 import com.zhouyan.happypinyin.widget.ViewPagerSlide;
+
+import org.greenrobot.eventbus.EventBus;
+import org.greenrobot.eventbus.Subscribe;
+import org.greenrobot.eventbus.ThreadMode;
 
 import butterknife.BindView;
 import fm.jiecao.jcvideoplayer_lib.JCVideoPlayer;
@@ -20,6 +26,8 @@ public class MainActivity extends BaseActivity {
     ViewPagerSlide viewPager;
     @BindView(R.id.radiogroup)
     RadioGroup radiogroup;
+    @BindView(R.id.controller_tab1)
+    RadioButton tab1;
 
     @Override
     public int getLayoutId() {
@@ -29,6 +37,7 @@ public class MainActivity extends BaseActivity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        EventBus.getDefault().register(this);
         initView();
     }
 
@@ -62,6 +71,20 @@ public class MainActivity extends BaseActivity {
             }
         });
     }
+
+    @Subscribe(threadMode = ThreadMode.MAIN)
+    public void Event(LoginMessage messageEvent) {
+        tab1.setChecked(true);
+    }
+
+    @Override
+    public void onDestroy() {
+        super.onDestroy();
+        if (EventBus.getDefault().isRegistered(this)) {
+            EventBus.getDefault().unregister(this);
+        }
+    }
+
 
     @Override
     public void onBackPressed() {

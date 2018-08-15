@@ -15,7 +15,7 @@ android {
         minSdkVersion 16
         targetSdkVersion 26
         buildToolsVersion '27.0.3'
-        versionCode 20180809
+        versionCode 20180815
         versionName "1.1.1"
         testInstrumentationRunner "android.support.test.runner.AndroidJUnitRunner"
 

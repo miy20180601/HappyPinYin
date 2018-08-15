@@ -47,6 +47,9 @@
         <activity
             android:name=".activity.EditProfileActivity"
             android:screenOrientation="portrait"/>
+        <activity
+            android:name=".activity.ForgetPasswordActivity"
+            android:screenOrientation="portrait" />
 
         <!-- 微信登录、分享回调 -->
         <activity

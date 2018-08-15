@@ -51,7 +51,7 @@ public class WXPayEntryActivity extends Activity implements IWXAPIEventHandler {
 	public void onResp(BaseResp resp) {
 		if (resp.getType() == ConstantsAPI.COMMAND_PAY_BY_WX) {
 			if (resp.errCode==0){
-				EventBus.getDefault().post(new PayMessage());
+				EventBus.getDefault().postSticky(new PayMessage());
 
 			}else {
 //				AlertDialog.Builder builder = new AlertDialog.Builder(this);

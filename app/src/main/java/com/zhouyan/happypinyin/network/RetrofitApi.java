@@ -34,6 +34,16 @@ public interface RetrofitApi {
     );
 
     /**
+     * 请求修改密码验证码
+     * 参数：手机号码 phone
+     */
+    @FormUrlEncoded
+    @POST("qzVideo/appSendCodeForPassword.do")
+    Observable<BaseEntity<String>> appSendCodeForPassword(
+            @Field("phone") String phone
+    );
+
+    /**
      * 注册接口
      * 参数：手机号码 phone 验证码 code 密码 password
      */
@@ -41,6 +51,17 @@ public interface RetrofitApi {
     @POST("qzVideo/appregister.do")
     Observable<BaseEntity<String>> appregister(
             @Field("nickName") String nickName,
+            @Field("phone") String phone,
+            @Field("code") String code,
+            @Field("password") String password
+    );
+/**
+     * 修改密码
+     * 参数：手机号码 phone 验证码 code 密码 password
+     */
+    @FormUrlEncoded
+    @POST("qzVideo/appModifyPassword.do")
+    Observable<BaseEntity<String>> appModifyPassword(
             @Field("phone") String phone,
             @Field("code") String code,
             @Field("password") String password
@@ -77,8 +98,8 @@ public interface RetrofitApi {
     Observable<BaseEntity<List<VideoModel>>> appVideoList(@Field("phone") String phone);
 
     /**
-     *  付费接口
-     *  isTotalPay,全部视频购买传值yes,  total_fee,支付费用  userId,用户id
+     * 付费接口
+     * isTotalPay,全部视频购买传值yes,  total_fee,支付费用  userId,用户id
      */
     @FormUrlEncoded
     @POST("qzVideo/app/tenpay/prepay.do")
@@ -107,11 +128,10 @@ public interface RetrofitApi {
     Observable<BaseEntity<UserInfo>> appUpdateAgeInfo(@Field("age") String age);
 
     /**
-     *  全部购买价格
-     *
+     * 全部购买价格
      */
     @FormUrlEncoded
     @POST("qzVideo/appVideoTotalPrice.do")
-    Observable<BaseEntity<Double>> appVideoTotalPrice(@Field("i") String i );
+    Observable<BaseEntity<Double>> appVideoTotalPrice(@Field("i") String i);
 }
 

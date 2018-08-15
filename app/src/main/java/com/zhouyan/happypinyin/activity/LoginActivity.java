@@ -17,6 +17,7 @@ import android.widget.RelativeLayout;
 import android.widget.TextView;
 
 import com.zhouyan.happypinyin.R;
+import com.zhouyan.happypinyin.busmsg.LoginMessage;
 import com.zhouyan.happypinyin.entities.BaseEntity;
 import com.zhouyan.happypinyin.entities.UserInfo;
 import com.zhouyan.happypinyin.network.BaseObserver;
@@ -29,6 +30,8 @@ import com.zhouyan.happypinyin.utils.LMUtils;
 import com.zhouyan.happypinyin.utils.NToast;
 import com.zhouyan.happypinyin.utils.SPUtil;
 import com.zhouyan.happypinyin.widget.ClearWriteEditText;
+
+import org.greenrobot.eventbus.EventBus;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
@@ -143,7 +146,7 @@ public class LoginActivity extends AppCompatActivity {
                 break;
             case R.id.tv_login_forgot:
                 // TODO: 2018/4/10  找回密码
-                //                startActivityForResult(new Intent(this, ForgetPasswordActivity.class), 2);
+                startActivity(new Intent(this, ForgetPasswordActivity.class));
                 break;
             case R.id.tv_login_register:
                 startActivityForResult(new Intent(this, RegisterActivity.class), 1);
@@ -167,6 +170,7 @@ public class LoginActivity extends AppCompatActivity {
                 }
                 mACache.put(Constant.USERINFO,userInfo);
                 startActivity(new Intent(LoginActivity.this, MainActivity.class));
+                EventBus.getDefault().postSticky(new LoginMessage());
                 finish();
             }
 

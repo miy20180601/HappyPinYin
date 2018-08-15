@@ -3,6 +3,7 @@ package com.zhouyan.happypinyin.fragment;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
+import android.support.v4.widget.SwipeRefreshLayout;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.text.TextUtils;
@@ -23,6 +24,7 @@ import com.zhouyan.happypinyin.BuildConfig;
 import com.zhouyan.happypinyin.R;
 import com.zhouyan.happypinyin.adapter.VideoQuickAdaper;
 import com.zhouyan.happypinyin.base.BaseFragment;
+import com.zhouyan.happypinyin.busmsg.LoginMessage;
 import com.zhouyan.happypinyin.busmsg.PayMessage;
 import com.zhouyan.happypinyin.entities.BaseEntity;
 import com.zhouyan.happypinyin.entities.PrePayModel;
@@ -57,6 +59,8 @@ public class HomeFragment extends BaseFragment {
     TextView barTitle;
     @BindView(R.id.recyclerview)
     RecyclerView mRecyclerView;
+    @BindView(R.id.refresh_layout)
+    SwipeRefreshLayout mRefreshLayout;
 
     List<VideoModel> mDataList = new ArrayList<>();
     private VideoQuickAdaper mVideoAdapter;
@@ -107,6 +111,13 @@ public class HomeFragment extends BaseFragment {
             }
         });
         mRecyclerView.setAdapter(mVideoAdapter);
+
+        mRefreshLayout.setOnRefreshListener(new SwipeRefreshLayout.OnRefreshListener() {
+            @Override
+            public void onRefresh() {
+                loadData();
+            }
+        });
     }
 
     private void loadData() {
@@ -116,6 +127,9 @@ public class HomeFragment extends BaseFragment {
                 (new BaseObserver<List<VideoModel>>() {
                     @Override
                     protected void onHandleSuccess(List<VideoModel> dataList, String msg) {
+                        if (mRefreshLayout.isRefreshing()){
+                            mRefreshLayout.setRefreshing(false);
+                        }
                         mDataList.clear();
                         mDataList.addAll(dataList);
                         mVideoAdapter.setNewData(mDataList);
@@ -144,14 +158,14 @@ public class HomeFragment extends BaseFragment {
         radioGroup.setOnCheckedChangeListener(new RadioGroup.OnCheckedChangeListener() {
             @Override
             public void onCheckedChanged(RadioGroup group, int checkedId) {
-                switch (checkedId){
+                switch (checkedId) {
                     case R.id.rb_single:
                         isTotalPay = null;
                         tvPrice.setText(videoModel.getMuch() + "元");
                         break;
                     case R.id.rb_all:
                         isTotalPay = "yes";
-                        tvPrice.setText(totalPrice+"元");
+                        tvPrice.setText(totalPrice + "元");
                         break;
                 }
             }
@@ -177,37 +191,40 @@ public class HomeFragment extends BaseFragment {
         contentView.findViewById(R.id.tv_cancel).setOnClickListener(listener);
 
     }
+
     @Subscribe(threadMode = ThreadMode.MAIN)
     public void Event(PayMessage messageEvent) {
         loadData();
     }
 
+    @Subscribe(threadMode = ThreadMode.MAIN)
+    public void Event(LoginMessage messageEvent) {
+        loadData();
+    }
 
     @Override
     public void onDestroy() {
         super.onDestroy();
-        if(EventBus.getDefault().isRegistered(this)) {
+        if (EventBus.getDefault().isRegistered(this)) {
             EventBus.getDefault().unregister(this);
         }
     }
 
-
     private void prePay(VideoModel videoModel) {
         String videoId = null;
         double amount;
-        if (TextUtils.isEmpty(isTotalPay)){
+        if (TextUtils.isEmpty(isTotalPay)) {
             videoId = videoModel.getVideoId();
             amount = videoModel.getMuch();
-        }else {
-            if (BuildConfig.DEBUG){
-                amount = 0.1;
-            }else {
-                amount = totalPrice;;
-            }
+//            amount = 0.1;
+        } else {
+            amount = totalPrice;
+//            amount = 0.1;
+
 
         }
         Observable<BaseEntity<PrePayModel>> observable = RetrofitFactory
-                .getInstance().prepay(amount, videoId, isTotalPay,mUserInfo.getUserId());
+                .getInstance().prepay(amount, videoId, isTotalPay, mUserInfo.getUserId());
         observable.compose(RxSchedulers.<BaseEntity<PrePayModel>>compose
                 (mContext)).subscribe(new BaseObserver<PrePayModel>() {
             @Override
@@ -239,6 +256,7 @@ public class HomeFragment extends BaseFragment {
     public void onPause() {
         super.onPause();
         JCVideoPlayer.releaseAllVideos();
+
     }
 
 }
